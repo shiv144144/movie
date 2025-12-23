@@ -1,0 +1,7 @@
+{
+  "name": "MovieTube - AI Shoppable Video",
+  "description": "An AI-powered video platform that detects objects in movie trailers on pause and provides direct shoppable links to Amazon.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
