@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Upload, Play, Film, Clock, Heart, Search, LogOut, Sparkles, Home, User as UserIcon, TrendingUp } from 'lucide-react';
+import { Upload, Play, Film, Search, LogOut, Sparkles, Home, User as UserIcon, TrendingUp, Bell, Share2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import VideoStudio from './VideoStudio';
 
@@ -11,39 +11,38 @@ const Dashboard: React.FC = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState('home');
 
-  // Mock initial data
-  const [videos, setVideos] = useState([
+  const [videos] = useState([
     {
       id: '1',
-      title: 'Action Movie Trailer 2024',
-      thumbnail: 'https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?auto=format&fit=crop&q=80&w=800',
+      title: 'Cinematic Action Sequence - Gear & Gadgets',
+      thumbnail: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&q=80&w=800',
       duration: '2:15',
       views: '1.2M views',
-      author: 'Universal Pictures'
+      author: 'Ariel Vision'
     },
     {
       id: '2',
-      title: 'Fashion Week Collection Highlight',
-      thumbnail: 'https://images.unsplash.com/photo-1539109132382-381bb3f1cff6?auto=format&fit=crop&q=80&w=800',
+      title: 'Summer 2024 Fashion Collection Preview',
+      thumbnail: 'https://images.unsplash.com/photo-1445205170230-053b830c6050?auto=format&fit=crop&q=80&w=800',
       duration: '5:42',
       views: '450K views',
-      author: 'Vogue'
+      author: 'Luxe Global'
     },
     {
       id: '3',
-      title: 'Next Gen Smartphone Reveal',
-      thumbnail: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=800',
+      title: 'Professional Desktop Setup Showcase',
+      thumbnail: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800',
       duration: '1:30',
       views: '890K views',
-      author: 'Tech Giant'
+      author: 'TechStream'
     },
     {
       id: '4',
-      title: 'Luxury Watch Craftsmanship',
-      thumbnail: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800',
+      title: 'Modern Architecture and Interior Elements',
+      thumbnail: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=800',
       duration: '3:20',
       views: '120K views',
-      author: 'Horology'
+      author: 'DesignLab'
     }
   ]);
 
@@ -58,16 +57,7 @@ const Dashboard: React.FC = () => {
         if (p >= 100) {
           clearInterval(interval);
           const url = URL.createObjectURL(file);
-          const newVideo = {
-            id: Date.now().toString(),
-            title: file.name,
-            thumbnail: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&q=80&w=800',
-            duration: 'Local',
-            views: '0 views',
-            author: user?.username || 'You',
-            url: url
-          };
-          setVideos([newVideo, ...videos]);
+          setSelectedVideo(url);
           setIsUploading(false);
           setUploadProgress(0);
         }
@@ -75,44 +65,75 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'MovieTube AI',
+          text: 'Check out this AI-powered shoppable video platform!',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Error sharing:', err);
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white pb-20 md:pb-0">
-      {/* Navigation */}
-      <nav className="sticky top-0 z-40 bg-[#0f0f0f]/95 backdrop-blur-md border-b border-white/10 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2">
-            <div className="bg-red-600 p-1.5 rounded-lg shadow-[0_0_15px_rgba(220,38,38,0.4)]">
+    <div className="min-h-screen bg-[#0f0f0f] text-white pb-24 md:pb-8">
+      {/* Navbar */}
+      <nav className="sticky top-0 z-40 bg-[#0f0f0f]/80 backdrop-blur-xl border-b border-white/5 px-4 md:px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-10">
+          <div className="flex items-center gap-2.5">
+            <div className="bg-gradient-to-br from-red-500 to-red-700 p-2 rounded-xl shadow-lg shadow-red-600/20">
               <Play className="w-5 h-5 fill-white text-white" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight">MovieTube</h1>
+            <h1 className="text-xl font-black tracking-tighter uppercase">MovieTube</h1>
           </div>
           
-          <div className="hidden lg:flex items-center bg-white/5 border border-white/10 rounded-full px-4 py-1.5 w-96 group focus-within:border-red-500/50 transition-all">
-            <Search className="w-4 h-4 text-gray-400 group-focus-within:text-red-500" />
+          <div className="hidden lg:flex items-center bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-2 w-[400px] group transition-all focus-within:bg-white/[0.05] focus-within:border-red-500/50">
+            <Search className="w-4 h-4 text-gray-500 group-focus-within:text-red-500" />
             <input 
               type="text" 
-              placeholder="Search trailers..." 
-              className="bg-transparent border-none outline-none w-full px-3 text-sm"
+              placeholder="Search trending products..." 
+              className="bg-transparent border-none outline-none w-full px-4 text-sm font-medium placeholder:text-gray-600"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <label className="hidden sm:flex cursor-pointer bg-white text-black font-bold px-4 py-1.5 rounded-full text-sm hover:bg-gray-200 transition-colors items-center gap-2">
+        <div className="flex items-center gap-2 md:gap-5">
+          <button 
+            onClick={handleShare}
+            className="p-2 text-gray-400 hover:text-white transition-colors flex items-center gap-2 md:bg-white/5 md:px-4 md:rounded-xl"
+            title="Share Platform"
+          >
+            <Share2 className="w-5 h-5" />
+            <span className="hidden md:inline text-xs font-bold uppercase tracking-wider">Share</span>
+          </button>
+          
+          <button className="p-2 text-gray-400 hover:text-white transition-colors relative">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-2 right-2 w-2 h-2 bg-red-600 rounded-full border-2 border-[#0f0f0f]"></span>
+          </button>
+          
+          <label className="hidden md:flex cursor-pointer bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-2xl text-sm transition-all transform active:scale-95 items-center gap-2 shadow-lg shadow-red-600/10">
             <Upload className="w-4 h-4" />
-            Upload
+            Publish Video
             <input type="file" accept="video/*" className="hidden" onChange={handleFileUpload} />
           </label>
           
-          <div className="flex items-center gap-3 border-l border-white/10 pl-4">
-            <div className="text-right hidden md:block">
-              <p className="text-sm font-medium">{user?.username}</p>
-              <p className="text-xs text-gray-400">{user?.email}</p>
+          <div className="flex items-center gap-3 md:border-l md:border-white/10 md:pl-5">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold leading-none">{user?.username}</p>
+              <p className="text-[10px] text-gray-500 mt-1 uppercase font-black tracking-tighter">Premium Member</p>
             </div>
             <button 
               onClick={logout}
-              className="p-2 bg-white/5 hover:bg-red-600/20 hover:text-red-500 rounded-full transition-all"
-              title="Logout"
+              className="w-10 h-10 rounded-2xl bg-white/[0.03] border border-white/10 flex items-center justify-center hover:bg-red-600/10 hover:text-red-500 transition-all"
             >
               <LogOut className="w-5 h-5" />
             </button>
@@ -120,161 +141,111 @@ const Dashboard: React.FC = () => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 md:py-8">
-        {/* Banner Section */}
-        <section className="mb-8 md:mb-12 relative rounded-2xl md:rounded-3xl overflow-hidden aspect-[16/9] md:aspect-[21/7] group cursor-pointer">
+      <main className="max-w-[1600px] mx-auto px-4 md:px-8 pt-6">
+        {/* Featured Section */}
+        <section className="mb-10 relative rounded-[2rem] overflow-hidden aspect-[16/9] md:aspect-[21/8] group">
           <img 
-            src="https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&q=80&w=1200" 
-            className="absolute inset-0 w-full h-full object-cover brightness-50 group-hover:scale-105 transition-transform duration-700" 
-            alt="Featured" 
+            src="https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&q=80&w=1200" 
+            className="absolute inset-0 w-full h-full object-cover brightness-[0.4] group-hover:scale-105 transition-transform duration-[2s]" 
+            alt="Hero" 
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 p-6 md:p-12 w-full md:w-2/3">
-            <div className="flex items-center gap-2 text-red-500 mb-2 md:mb-4 font-bold tracking-wider uppercase text-[10px] md:text-xs">
-              <Sparkles className="w-4 h-4" />
-              Now Trending with AI Detection
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0f0f0f]/80 via-transparent to-transparent" />
+          
+          <div className="absolute bottom-0 left-0 p-8 md:p-16 w-full md:w-3/4">
+            <div className="inline-flex items-center gap-2 bg-red-600/20 border border-red-500/30 text-red-500 px-3 py-1 rounded-full mb-4 font-bold text-[10px] tracking-widest uppercase backdrop-blur-md animate-pulse">
+              <Sparkles className="w-3 h-3" /> AI SHOPS LIVE
             </div>
-            <h2 className="text-2xl md:text-5xl lg:text-6xl font-black mb-2 md:mb-4 leading-tight">SHOP THE LOOK IN REAL-TIME</h2>
-            <p className="text-gray-300 text-sm md:text-lg mb-4 md:mb-8 max-w-xl line-clamp-2 md:line-clamp-none">
-              Watch your favorite movie trailers and discover the products they use. Powered by Gemini AI for real-time object detection.
+            <h2 className="text-3xl md:text-6xl font-black mb-4 leading-[1.1] tracking-tighter uppercase">Discover <br/>Products <br/>In Motion</h2>
+            <p className="text-gray-400 text-sm md:text-lg mb-8 max-w-xl leading-relaxed">
+              Experience the first shoppable video engine powered by Gemini Vision. Pause any frame to instantly find every product on screen.
             </p>
-            <div className="flex gap-3 md:gap-4">
+            <div className="flex flex-wrap gap-4">
               <button 
                 onClick={() => setSelectedVideo('https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')}
-                className="bg-red-600 text-white font-bold px-6 md:px-8 py-2 md:py-3 rounded-full flex items-center gap-2 hover:bg-red-700 transition-all shadow-xl text-sm md:text-base"
+                className="bg-white text-black font-black px-8 py-3.5 rounded-2xl flex items-center gap-3 hover:bg-red-600 hover:text-white transition-all transform active:scale-95 shadow-xl"
               >
-                <Play className="w-4 h-4 md:w-5 md:h-5 fill-white" /> Watch Now
-              </button>
-              <button className="hidden sm:block bg-white/10 backdrop-blur-md border border-white/20 text-white font-bold px-8 py-3 rounded-full hover:bg-white/20 transition-all">
-                Learn More
+                <Play className="w-5 h-5 fill-current" /> EXPLORE NOW
               </button>
             </div>
           </div>
         </section>
 
-        {/* Upload Status */}
-        {isUploading && (
-          <div className="mb-8 p-6 bg-[#1a1a1a] rounded-2xl border border-red-500/30">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-red-600 p-2 rounded-lg">
-                  <Upload className="w-5 h-5" />
+        {/* Feed Headers */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-1.5 h-8 bg-red-600 rounded-full"></div>
+            <h3 className="text-2xl font-black tracking-tighter uppercase">Trending Trailers</h3>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+          {videos.map((video) => (
+            <div 
+              key={video.id} 
+              className="group cursor-pointer"
+              onClick={() => setSelectedVideo(video.url || 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')}
+            >
+              <div className="relative aspect-video rounded-3xl overflow-hidden mb-4 shadow-2xl ring-1 ring-white/10">
+                <img 
+                  src={video.thumbnail} 
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1.5s]" 
+                  alt={video.title} 
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center backdrop-blur-[2px]">
+                  <div className="bg-white text-black p-5 rounded-3xl shadow-2xl transform translate-y-8 group-hover:translate-y-0 transition-all duration-500">
+                    <Play className="w-8 h-8 fill-current" />
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold">Uploading Video...</h3>
-                  <p className="text-xs text-gray-400">Processing for MovieTube Studio</p>
+                <div className="absolute bottom-4 right-4 bg-black/80 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] font-black tracking-widest border border-white/10">
+                  {video.duration}
+                </div>
+                <div className="absolute top-4 left-4">
+                   <span className="bg-red-600 text-[10px] font-black px-3 py-1.5 rounded-xl text-white flex items-center gap-2 shadow-xl ring-1 ring-white/20">
+                     <Sparkles className="w-3 h-3" /> VISION ENABLED
+                   </span>
                 </div>
               </div>
-              <span className="text-sm font-bold text-red-500">{uploadProgress}%</span>
-            </div>
-            <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-              <div 
-                className="bg-red-600 h-full transition-all duration-300" 
-                style={{ width: `${uploadProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Video Grid */}
-        <section>
-          <div className="flex items-center justify-between mb-6 md:mb-8">
-            <h3 className="text-xl md:text-2xl font-bold flex items-center gap-3">
-              <Film className="w-5 h-5 md:w-6 md:h-6 text-red-500" />
-              Recommended for You
-            </h3>
-            <div className="flex gap-2">
-              <button className="bg-white text-black px-4 py-1 rounded-full text-xs md:text-sm font-bold transition-colors">Popular</button>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {videos.map((video) => (
-              <div 
-                key={video.id} 
-                className="group cursor-pointer"
-                onClick={() => setSelectedVideo(video.url || 'https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4')}
-              >
-                <div className="relative aspect-video rounded-xl md:rounded-2xl overflow-hidden mb-2 md:mb-3 shadow-lg">
-                  <img 
-                    src={video.thumbnail} 
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                    alt={video.title} 
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <div className="bg-red-600 p-3 md:p-4 rounded-full shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                      <Play className="w-5 h-5 md:w-6 md:h-6 fill-white text-white" />
-                    </div>
-                  </div>
-                  <div className="absolute bottom-2 right-2 bg-black/80 px-1.5 py-0.5 rounded text-[10px] font-bold">
-                    {video.duration}
-                  </div>
-                  <div className="absolute top-2 left-2 flex gap-1">
-                     <span className="bg-red-600/90 text-[9px] font-bold px-2 py-0.5 rounded text-white flex items-center gap-1 backdrop-blur-sm shadow-lg">
-                       <Sparkles className="w-2.5 h-2.5" /> AI SHOP
-                     </span>
-                  </div>
-                </div>
-                <div className="px-1">
-                  <h4 className="font-bold text-sm md:text-base line-clamp-2 group-hover:text-red-500 transition-colors leading-snug">{video.title}</h4>
-                  <div className="flex items-center gap-2 mt-1 text-gray-400 text-xs md:text-sm">
-                    <span>{video.author}</span>
-                    <span className="w-0.5 h-0.5 bg-gray-600 rounded-full" />
-                    <span>{video.views}</span>
-                  </div>
+              <div className="px-1">
+                <h4 className="font-bold text-lg line-clamp-2 leading-snug group-hover:text-red-500 transition-colors tracking-tight uppercase">{video.title}</h4>
+                <div className="flex items-center gap-3 mt-2 text-gray-500 text-xs font-bold uppercase tracking-wider">
+                  <span>{video.author}</span>
+                  <span className="w-1.5 h-1.5 bg-white/10 rounded-full" />
+                  <span>{video.views}</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </div>
+          ))}
+        </div>
       </main>
 
-      {/* Mobile Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#0f0f0f]/95 backdrop-blur-lg border-t border-white/10 px-6 py-3 flex items-center justify-between md:hidden z-40">
-        <button 
-          onClick={() => setActiveTab('home')}
-          className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'home' ? 'text-red-500' : 'text-gray-400'}`}
-        >
-          <Home className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Home</span>
+      {/* Mobile Nav */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#0f0f0f]/90 backdrop-blur-2xl border-t border-white/5 px-8 py-4 flex items-center justify-between md:hidden z-50 safe-area-bottom">
+        <button className="flex flex-col items-center gap-1.5 text-red-500">
+          <Home className="w-6 h-6 fill-current" />
+          <span className="text-[9px] font-black uppercase tracking-widest">Home</span>
         </button>
-        <button 
-          onClick={() => setActiveTab('trending')}
-          className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'trending' ? 'text-red-500' : 'text-gray-400'}`}
-        >
+        <button className="flex flex-col items-center gap-1.5 text-gray-500">
           <TrendingUp className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Trending</span>
+          <span className="text-[9px] font-black uppercase tracking-widest">Global</span>
         </button>
-        <label className="flex flex-col items-center gap-1 text-gray-400">
-          <div className="bg-white text-black p-2 rounded-xl -mt-6 shadow-xl border-4 border-[#0f0f0f]">
-            <Upload className="w-6 h-6" />
+        <label className="relative -top-6">
+          <div className="bg-gradient-to-br from-red-500 to-red-700 text-white p-4 rounded-3xl shadow-[0_10px_30px_rgba(220,38,38,0.5)] border-4 border-[#0f0f0f]">
+            <Upload className="w-7 h-7" />
           </div>
-          <span className="text-[10px] font-bold mt-0.5">Upload</span>
           <input type="file" accept="video/*" className="hidden" onChange={handleFileUpload} />
         </label>
-        <button 
-          onClick={() => setActiveTab('search')}
-          className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'search' ? 'text-red-500' : 'text-gray-400'}`}
-        >
+        <button className="flex flex-col items-center gap-1.5 text-gray-500">
           <Search className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Search</span>
+          <span className="text-[9px] font-black uppercase tracking-widest">Find</span>
         </button>
-        <button 
-          onClick={() => setActiveTab('profile')}
-          className={`flex flex-col items-center gap-1 transition-colors ${activeTab === 'profile' ? 'text-red-500' : 'text-gray-400'}`}
-        >
-          <UserIcon className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Profile</span>
+        <button className="flex flex-col items-center gap-1.5 text-gray-500" onClick={handleShare}>
+          <Share2 className="w-6 h-6" />
+          <span className="text-[9px] font-black uppercase tracking-widest">Share</span>
         </button>
       </div>
 
-      {/* Video Studio Overlay */}
-      {selectedVideo && (
-        <VideoStudio 
-          videoUrl={selectedVideo} 
-          onClose={() => setSelectedVideo(null)} 
-        />
-      )}
+      {selectedVideo && <VideoStudio videoUrl={selectedVideo} onClose={() => setSelectedVideo(null)} />}
     </div>
   );
 };
